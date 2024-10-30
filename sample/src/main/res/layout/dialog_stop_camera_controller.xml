@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="250dp"
+    android:layout_height="120dp"
+    android:background="@drawable/camera_controller_stop_dialog_bg"
+    android:clickable="true">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/confirm_stop_camera_control"
+        android:textColor="@color/white"
+        android:textSize="@dimen/textsize_16"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="18dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/camera_controller_stop_bg"
+        android:gravity="center_vertical"
+        android:paddingLeft="@dimen/dp_8"
+        android:paddingRight="@dimen/dp_8"
+        android:text="@string/stop"
+        android:textColor="@color/white"
+        android:textSize="@dimen/textsize_14" />
+
+    <TextView
+        android:id="@+id/tv_not_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignBottom="@id/tv_stop"
+        android:layout_marginEnd="@dimen/dp_8"
+        android:layout_toStartOf="@id/tv_stop"
+        android:background="@drawable/camera_controller_not_stop_bg"
+        android:gravity="center_vertical"
+        android:paddingLeft="@dimen/dp_8"
+        android:paddingRight="@dimen/dp_8"
+        android:text="@string/not_stop"
+        android:textColor="@color/white"
+        android:textSize="@dimen/textsize_14" />
+
+</RelativeLayout>

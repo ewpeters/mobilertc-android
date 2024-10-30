@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/video_item_popup_window_bg"
+    android:orientation="vertical"
+    android:paddingLeft="10dp"
+    android:paddingTop="2dp"
+    android:paddingRight="10dp"
+    android:paddingBottom="2dp">
+
+    <TextView
+        android:id="@+id/tv_remove"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dp_22"
+        android:gravity="center_vertical"
+        android:text="@string/remove_user"
+        android:textColor="#FFF"
+        android:textSize="@dimen/textsize_12" />
+
+    <TextView
+        android:id="@+id/tv_req_camera_ctrl"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dp_22"
+        android:gravity="center_vertical"
+        android:textColor="#FFF"
+        android:textSize="@dimen/textsize_12" />
+
+</LinearLayout>
