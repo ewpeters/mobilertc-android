@@ -90,10 +90,17 @@
     <string name="request_camera_control_result_approve">You can now control %s\'s camera</string>
     <string name="request_camera_control_result_decline">%s declined your request</string>
     <string name="stop_camera_control_tip">You can no longer control %s\'s camera because permissions have been revoked</string>
+    <string name="stop_camera_control_received_tip">%s stopped controlling your camera</string>
     <string name="stop_camera_control">Stop Camera Control</string>
     <string name="request_camera_control">Request Camera Control</string>
     <string name="remove_user">Remove</string>
     <string name="confirm_stop_camera_control">Stop camera control?</string>
+    <string name="camera_control_request_received">%s is requesting control of your camera</string>
     <string name="stop">Stop</string>
     <string name="not_stop">Don\'t Stop</string>
+    <string name="camera_control_approve">Approve</string>
+    <string name="camera_control_decline">Decline</string>
+    <string name="switch_flash">Switch Flash</string>
+    <string name="virtual_background">Virtual Background</string>
+    <string name="video_mask">Video Mask</string>
 </resources>

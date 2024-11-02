@@ -302,10 +302,10 @@ public class LowerThirdSettingFragment extends BottomSheetDialogFragment {
 
         if (ZoomVideoSDK.getInstance().getSession() != null) {
             ZoomVideoSDKUser mySelf = ZoomVideoSDK.getInstance().getSession().getMySelf();
-            Log.e(TAG, "is Video On : getVideoStatus: " + mySelf.getVideoStatus().isOn());
+            Log.e(TAG, "is Video On : getVideoStatus: " + mySelf.getVideoPipe().getVideoStatus().isOn());
             Log.e(TAG, "is Video On : getVideoCanvas.getVideoStatus: " + mySelf.getVideoCanvas().getVideoStatus().isOn());
             Log.e(TAG, "is Video On : getVideoPipe.getVideoStatus: " + mySelf.getVideoPipe().getVideoStatus().isOn());
-            if (mySelf.getVideoStatus().isOn()) {
+            if (mySelf.getVideoPipe().getVideoStatus().isOn()) {
                 FrameLayout frameLayout = rootView.findViewById(R.id.previewLayout);
                 if (!isUseRawDataRender) {
                     zoomCanvas = new ZoomVideoSDKVideoView(context, false);

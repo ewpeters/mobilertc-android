@@ -11,6 +11,7 @@ local.properties
 
 # Log/OS Files
 *.log
+**/.DS_Store
 
 # Android Studio generated files and folders
 captures/
@@ -166,3 +167,6 @@ fabric.properties
 
 # End of https://www.toptal.com/developers/gitignore/api/android,androidstudio
 
+.DS_Store
+.DS_Store
+sample/.DS_Store

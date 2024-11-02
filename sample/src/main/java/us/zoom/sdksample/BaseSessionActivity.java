@@ -36,14 +36,18 @@ import androidx.core.app.ActivityCompat;
 import java.util.List;
 import java.util.Random;
 
+import us.zoom.sdk.UVCCameraStatus;
 import us.zoom.sdk.ZoomVideoSDKAnnotationHelper;
 import us.zoom.sdk.ZoomVideoSDKAudioHelper;
 import us.zoom.sdk.ZoomVideoSDKCRCCallStatus;
+import us.zoom.sdk.ZoomVideoSDKCameraControlRequestHandler;
+import us.zoom.sdk.ZoomVideoSDKCameraControlRequestType;
 import us.zoom.sdk.ZoomVideoSDKChatHelper;
 import us.zoom.sdk.ZoomVideoSDKChatMessageDeleteType;
 import us.zoom.sdk.ZoomVideoSDKChatPrivilegeType;
 import us.zoom.sdk.ZoomVideoSDKDelegate;
 import us.zoom.sdk.ZoomVideoSDKErrors;
+import us.zoom.sdk.ZoomVideoSDKFileTransferStatus;
 import us.zoom.sdk.ZoomVideoSDKLiveStreamHelper;
 import us.zoom.sdk.ZoomVideoSDKLiveStreamStatus;
 import us.zoom.sdk.ZoomVideoSDKLiveTranscriptionHelper;
@@ -53,14 +57,17 @@ import us.zoom.sdk.ZoomVideoSDKPasswordHandler;
 import us.zoom.sdk.ZoomVideoSDKPreProcessRawData;
 import us.zoom.sdk.ZoomVideoSDKProxySettingHandler;
 import us.zoom.sdk.ZoomVideoSDKRawDataPipe;
+import us.zoom.sdk.ZoomVideoSDKReceiveFile;
 import us.zoom.sdk.ZoomVideoSDKRecordingConsentHandler;
 import us.zoom.sdk.ZoomVideoSDKRecordingStatus;
 import us.zoom.sdk.ZoomVideoSDKPhoneFailedReason;
 import us.zoom.sdk.ZoomVideoSDKPhoneStatus;
 import us.zoom.sdk.ZoomVideoSDKSSLCertificateInfo;
+import us.zoom.sdk.ZoomVideoSDKSendFile;
 import us.zoom.sdk.ZoomVideoSDKSession;
 import us.zoom.sdk.ZoomVideoSDKSessionASVStatisticInfo;
 import us.zoom.sdk.ZoomVideoSDKSessionAudioStatisticInfo;
+import us.zoom.sdk.ZoomVideoSDKSessionLeaveReason;
 import us.zoom.sdk.ZoomVideoSDKShareHelper;
 import us.zoom.sdk.ZoomVideoSDKTestMicStatus;
 import us.zoom.sdk.ZoomVideoSDKUserHelper;
@@ -84,18 +91,9 @@ import us.zoom.sdksample.util.NetworkUtil;
 
 import static us.zoom.sdksample.BaseMeetingActivity.RENDER_TYPE_OPENGLES;
 import static us.zoom.sdksample.BaseMeetingActivity.RENDER_TYPE_ZOOMRENDERER;
-import  org.json.JSONObject;
-import  org.json.JSONException;
-import  java.io.IOException;
-import  java.net.HttpURLConnection ;
-import  java.net.URL ;
-import  java.io.BufferedReader ;
-import  java.io.InputStreamReader ;
-import us.zoom.sdk.ZoomVideoSDKVirtualBackgroundHelper;
-import us.zoom.sdk.ZoomVideoSDKVirtualBackgroundItem;
-import us.zoom.sdk.ZoomVideoSDKVirtualBackgroundDataType;
+
 public class BaseSessionActivity extends AppCompatActivity implements View.OnClickListener, ZoomVideoSDKDelegate {
-    protected JSONObject jsonObject = new JSONObject();
+
     protected String[] defaultNameList = {"Grand Canyon", "Yosemite", "Yellowstone", "Disneyland", "Golden Gate Bridge", "Monument Valley", "Death Valley", "Brooklyn Bridge",
             "Hoover Dam", "Lake Tahoe"};
 
@@ -133,47 +131,9 @@ public class BaseSessionActivity extends AppCompatActivity implements View.OnCli
             renderType = getIntent().getIntExtra("render_type", RENDER_TYPE_ZOOMRENDERER);
         }
         setContentView(R.layout.activity_session);
-        String topicName = "erik-test-6";
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try  {
-                    jsonObject = getJSONObjectFromURL("https://a28e-97-115-94-223.ngrok-free.app/v1/sessions?topic="+topicName);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        thread.start();
-
         init();
     }
 
-    public static JSONObject getJSONObjectFromURL(String urlString) throws IOException, JSONException {
-        HttpURLConnection urlConnection = null;
-        URL url = new URL(urlString);
-        urlConnection = (HttpURLConnection) url.openConnection();
-        urlConnection.setRequestMethod("GET");
-        urlConnection.setReadTimeout(10000 /* milliseconds */ );
-        urlConnection.setConnectTimeout(15000 /* milliseconds */ );
-        urlConnection.setDoOutput(true);
-        urlConnection.connect();
-
-        BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
-        StringBuilder sb = new StringBuilder();
-
-        String line;
-        while ((line = br.readLine()) != null) {
-            sb.append(line + "\n");
-        }
-        br.close();
-
-        String jsonString = sb.toString();
-        Log.d(TAG, "JSON: " + jsonString);
-        System.out.println("JSON: " + jsonString);
-
-        return new JSONObject(jsonString);
-    }
     protected String getDefaultSessionName() {
         Random rand = new Random();
         int index = rand.nextInt(defaultNameList.length);
@@ -262,21 +222,6 @@ public class BaseSessionActivity extends AppCompatActivity implements View.OnCli
         if (null != ZoomVideoSDK.getInstance()) {
             ZoomVideoSDK.getInstance().addListener(this);
         }
-
-        ZoomVideoSDKVirtualBackgroundHelper bgHelper = ZoomVideoSDK.getInstance().getVirtualBackgroundHelper();
-        List<ZoomVideoSDKVirtualBackgroundItem> backgroundList = bgHelper.getVirtualBackgroundItemList();
-        ZoomVideoSDKVirtualBackgroundItem blurItem = null;
-        for (ZoomVideoSDKVirtualBackgroundItem item : backgroundList) {
-            if (item.getType().equals(ZoomVideoSDKVirtualBackgroundDataType.ZoomVideoSDKVirtualBackgroundDataType_Blur)) {
-                blurItem = item;
-                break;  // Exit loop once the match is found
-            }
-        }
-
-        Log.i(TAG, "blurItem: " + blurItem.getType());
-        Log.i(TAG, "blurItem: " + blurItem.getImageName());
-        bgHelper.setVirtualBackgroundItem(blurItem);
-        Log.i(TAG, "isSupportVirtualBackground: " + bgHelper.isSupportVirtualBackground());
     }
 
     @Override
@@ -411,13 +356,7 @@ public class BaseSessionActivity extends AppCompatActivity implements View.OnCli
             return;
         }
 
-        String sessionName = "";
-        try {
-            sessionName = jsonObject.getString("topic");
-        }
-        catch (JSONException e) {
-            Log.d(TAG, "topic not found in JSON");
-        }
+        String sessionName = sessionEditText.getText().toString().toLowerCase().trim();
 
         if (TextUtils.isEmpty(sessionName)) {
             Toast.makeText(this, "Session name is empty", Toast.LENGTH_LONG).show();
@@ -436,12 +375,9 @@ public class BaseSessionActivity extends AppCompatActivity implements View.OnCli
         videoOption.localVideoOn = true;
         sessionContext.videoOption = videoOption;
 
-        String name = "";
-        try {
-            name = jsonObject.getString("userName");
-        }
-        catch (JSONException e) {
-            Log.d(TAG, "userName not found in JSON");
+        String name = nameEdit.getText().toString();
+        if (TextUtils.isEmpty(name)) {
+            name = Build.MODEL;
         }
 
         String password = passwordEdit.getText().toString();
@@ -451,18 +387,12 @@ public class BaseSessionActivity extends AppCompatActivity implements View.OnCli
         sessionContext.userName = name;
 
         //GET START
-        String token = "";
-        try {
-            token = jsonObject.getString("token");
-        }
-        catch (JSONException e) {
-            Log.d(TAG, "token not found in JSON");
-        }
+        String token = Constants.TOKEN;
 
-        if (TextUtils.isEmpty(token)) {
-            Toast.makeText(this, "Token is empty", Toast.LENGTH_LONG).show();
-            return;
-        }
+//        if (TextUtils.isEmpty(token)) {
+//            Toast.makeText(this, "Token is empty", Toast.LENGTH_LONG).show();
+//            return;
+//        }
         //GET END
         sessionContext.token = token;
 
@@ -537,6 +467,11 @@ public class BaseSessionActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     public void onSessionLeave() {
+
+    }
+
+    @Override
+    public void onSessionLeave(ZoomVideoSDKSessionLeaveReason reason) {
 
     }
 
@@ -812,6 +747,16 @@ public class BaseSessionActivity extends AppCompatActivity implements View.OnCli
     }
 
     @Override
+    public void onVideoAlphaChannelStatusChanged(boolean isAlphaModeOn) {
+
+    }
+
+    @Override
+    public void onSpotlightVideoChanged(ZoomVideoSDKVideoHelper videoHelper, List<ZoomVideoSDKUser> userList) {
+
+    }
+
+    @Override
     public void onCloudRecordingStatus(ZoomVideoSDKRecordingStatus status, ZoomVideoSDKRecordingConsentHandler handler) {
 
     }
@@ -835,11 +780,6 @@ public class BaseSessionActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     public void onLiveTranscriptionStatus(ZoomVideoSDKLiveTranscriptionHelper.ZoomVideoSDKLiveTranscriptionStatus status) {
-
-    }
-
-    @Override
-    public void onLiveTranscriptionMsgReceived(String ltMsg, ZoomVideoSDKUser pUser, ZoomVideoSDKLiveTranscriptionHelper.ZoomVideoSDKLiveTranscriptionOperationType type) {
 
     }
 
@@ -870,6 +810,11 @@ public class BaseSessionActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     public void onCameraControlRequestResult(ZoomVideoSDKUser user, boolean isApproved) {
+
+    }
+
+    @Override
+    public void onCameraControlRequestReceived(ZoomVideoSDKUser user, ZoomVideoSDKCameraControlRequestType requestType, ZoomVideoSDKCameraControlRequestHandler requestHandler) {
 
     }
 
@@ -914,6 +859,26 @@ public class BaseSessionActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     public void onMicSpeakerVolumeChanged(int micVolume, int speakerVolume) {
+
+    }
+
+    @Override
+    public void onCalloutJoinSuccess(ZoomVideoSDKUser user, String phoneNumber) {
+
+    }
+
+    @Override
+    public void onSendFileStatus(ZoomVideoSDKSendFile file, ZoomVideoSDKFileTransferStatus status) {
+
+    }
+
+    @Override
+    public void onReceiveFileStatus(ZoomVideoSDKReceiveFile file, ZoomVideoSDKFileTransferStatus status) {
+
+    }
+
+    @Override
+    public void onUVCCameraStatusChange(String cameraId, UVCCameraStatus status) {
 
     }
 }

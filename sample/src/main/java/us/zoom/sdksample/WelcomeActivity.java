@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -188,6 +189,7 @@ public class WelcomeActivity extends AppCompatActivity {
         params.extendParam.speakerTestFilePath="/sdcard/Android/data/us.zoom.VideoSDKPlaygroud/files/test.mp3";
 
         int ret = ZoomVideoSDK.getInstance().initialize(this.getApplicationContext(), params);
+        Log.v("WelcomeActivity", "SDK initialization success, ret= " + ret);
         if (ret != ZoomVideoSDKErrors.Errors_Success) {
             Toast.makeText(this, ErrorMsgUtil.getMsgByErrorCode(ret), Toast.LENGTH_LONG).show();
         }else {

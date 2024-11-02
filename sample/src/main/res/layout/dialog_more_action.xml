@@ -170,6 +170,74 @@
             android:src="@drawable/raise_hand" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/llSwitchFlash"
+        android:layout_width="match_parent"
+        android:layout_height="66dp"
+        android:background="@drawable/more_action_last_bg"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="24dp"
+        android:paddingRight="16dp">
+
+        <TextView
+            android:id="@+id/tvSwitchFlash"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/switch_flash"
+            android:textColor="#232333"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/ivSwitchFlash"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/zm_ic_flashlight_on" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llVB"
+        android:layout_width="match_parent"
+        android:layout_height="66dp"
+        android:background="@drawable/more_action_last_bg"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="24dp"
+        android:paddingRight="16dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvVB"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/virtual_background"
+            android:textColor="#232333"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llmask"
+        android:layout_width="match_parent"
+        android:layout_height="66dp"
+        android:background="@drawable/more_action_last_bg"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="24dp"
+        android:paddingRight="16dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvMask"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/video_mask"
+            android:textColor="#232333"
+            android:textSize="16sp" />
+    </LinearLayout>
+
 <!--    <include layout="@layout/zm_item_more_record"/>-->
     <include layout="@layout/zm_item_more_emoji"/>
 </LinearLayout>

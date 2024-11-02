@@ -337,7 +337,7 @@ public class UserVideoAdapter extends RecyclerView.Adapter<UserVideoAdapter.Base
         viewHolder.user = user;
 
         if (null != user) {
-            if (!user.getVideoStatus().isOn()) {
+            if (!user.getVideoPipe().getVideoStatus().isOn()) {
                 viewHolder.video_off_contain.setVisibility(View.VISIBLE);
                 viewHolder.video_off_tips.setImageResource(R.drawable.zm_conf_no_avatar);
             } else {

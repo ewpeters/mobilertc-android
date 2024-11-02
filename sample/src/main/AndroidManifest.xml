@@ -114,6 +114,14 @@
             android:name=".FourScreenVideoActivity"
             android:exported="false" />
 
+        <activity android:name=".VBActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".MaskActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+
         <service android:name=".NotificationService"
             android:exported="false"
             android:foregroundServiceType="mediaProjection|microphone|mediaPlayback|connectedDevice"/>

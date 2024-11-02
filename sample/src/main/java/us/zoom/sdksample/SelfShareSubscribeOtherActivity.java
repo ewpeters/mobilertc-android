@@ -18,17 +18,21 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.List;
 
+import us.zoom.sdk.UVCCameraStatus;
 import us.zoom.sdk.ZoomVideoSDK;
 import us.zoom.sdk.ZoomVideoSDKAnnotationHelper;
 import us.zoom.sdk.ZoomVideoSDKAudioHelper;
 import us.zoom.sdk.ZoomVideoSDKAudioRawData;
 import us.zoom.sdk.ZoomVideoSDKCRCCallStatus;
+import us.zoom.sdk.ZoomVideoSDKCameraControlRequestHandler;
+import us.zoom.sdk.ZoomVideoSDKCameraControlRequestType;
 import us.zoom.sdk.ZoomVideoSDKChatHelper;
 import us.zoom.sdk.ZoomVideoSDKChatMessage;
 import us.zoom.sdk.ZoomVideoSDKChatMessageDeleteType;
 import us.zoom.sdk.ZoomVideoSDKChatPrivilegeType;
 import us.zoom.sdk.ZoomVideoSDKDelegate;
 import us.zoom.sdk.ZoomVideoSDKErrors;
+import us.zoom.sdk.ZoomVideoSDKFileTransferStatus;
 import us.zoom.sdk.ZoomVideoSDKLiveStreamHelper;
 import us.zoom.sdk.ZoomVideoSDKLiveStreamStatus;
 import us.zoom.sdk.ZoomVideoSDKLiveTranscriptionHelper;
@@ -39,10 +43,13 @@ import us.zoom.sdk.ZoomVideoSDKPhoneFailedReason;
 import us.zoom.sdk.ZoomVideoSDKPhoneStatus;
 import us.zoom.sdk.ZoomVideoSDKProxySettingHandler;
 import us.zoom.sdk.ZoomVideoSDKRawDataPipe;
+import us.zoom.sdk.ZoomVideoSDKReceiveFile;
 import us.zoom.sdk.ZoomVideoSDKRecordingConsentHandler;
 import us.zoom.sdk.ZoomVideoSDKRecordingStatus;
 import us.zoom.sdk.ZoomVideoSDKSSLCertificateInfo;
+import us.zoom.sdk.ZoomVideoSDKSendFile;
 import us.zoom.sdk.ZoomVideoSDKSession;
+import us.zoom.sdk.ZoomVideoSDKSessionLeaveReason;
 import us.zoom.sdk.ZoomVideoSDKShareHelper;
 import us.zoom.sdk.ZoomVideoSDKShareStatus;
 import us.zoom.sdk.ZoomVideoSDKTestMicStatus;
@@ -207,6 +214,11 @@ public class SelfShareSubscribeOtherActivity extends AppCompatActivity implement
     }
 
     @Override
+    public void onSessionLeave(ZoomVideoSDKSessionLeaveReason reason) {
+
+    }
+
+    @Override
     public void onError(int errorCode) {
 
     }
@@ -331,6 +343,16 @@ public class SelfShareSubscribeOtherActivity extends AppCompatActivity implement
     }
 
     @Override
+    public void onVideoAlphaChannelStatusChanged(boolean isAlphaModeOn) {
+
+    }
+
+    @Override
+    public void onSpotlightVideoChanged(ZoomVideoSDKVideoHelper videoHelper, List<ZoomVideoSDKUser> userList) {
+
+    }
+
+    @Override
     public void onCloudRecordingStatus(ZoomVideoSDKRecordingStatus status, ZoomVideoSDKRecordingConsentHandler handler) {
 
     }
@@ -361,11 +383,6 @@ public class SelfShareSubscribeOtherActivity extends AppCompatActivity implement
     }
 
     @Override
-    public void onLiveTranscriptionMsgReceived(String ltMsg, ZoomVideoSDKUser pUser, ZoomVideoSDKLiveTranscriptionHelper.ZoomVideoSDKLiveTranscriptionOperationType type) {
-
-    }
-
-    @Override
     public void onOriginalLanguageMsgReceived(ZoomVideoSDKLiveTranscriptionHelper.ILiveTranscriptionMessageInfo messageInfo) {
 
     }
@@ -392,6 +409,11 @@ public class SelfShareSubscribeOtherActivity extends AppCompatActivity implement
 
     @Override
     public void onCameraControlRequestResult(ZoomVideoSDKUser user, boolean isApproved) {
+
+    }
+
+    @Override
+    public void onCameraControlRequestReceived(ZoomVideoSDKUser user, ZoomVideoSDKCameraControlRequestType requestType, ZoomVideoSDKCameraControlRequestHandler requestHandler) {
 
     }
 
@@ -442,6 +464,26 @@ public class SelfShareSubscribeOtherActivity extends AppCompatActivity implement
 
     @Override
     public void onMicSpeakerVolumeChanged(int micVolume, int speakerVolume) {
+
+    }
+
+    @Override
+    public void onCalloutJoinSuccess(ZoomVideoSDKUser user, String phoneNumber) {
+
+    }
+
+    @Override
+    public void onSendFileStatus(ZoomVideoSDKSendFile file, ZoomVideoSDKFileTransferStatus status) {
+
+    }
+
+    @Override
+    public void onReceiveFileStatus(ZoomVideoSDKReceiveFile file, ZoomVideoSDKFileTransferStatus status) {
+
+    }
+
+    @Override
+    public void onUVCCameraStatusChange(String cameraId, UVCCameraStatus status) {
 
     }
 }

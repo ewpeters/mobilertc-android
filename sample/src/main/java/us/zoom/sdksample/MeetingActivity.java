@@ -8,10 +8,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import java.util.List;
 import java.util.Random;
@@ -38,9 +43,7 @@ import us.zoom.sdksample.feedback.view.FeedbackSubmitDialog;
 import us.zoom.sdksample.rawdata.RawDataRenderer;
 import us.zoom.sdksample.util.SharePreferenceUtil;
 import us.zoom.sdksample.view.ShareListDialog;
-import us.zoom.sdk.ZoomVideoSDKVirtualBackgroundHelper;
-import us.zoom.sdk.ZoomVideoSDKVirtualBackgroundItem;
-import us.zoom.sdk.ZoomVideoSDKVirtualBackgroundDataType;
+
 
 public class MeetingActivity extends BaseMeetingActivity implements RawDataRenderer.RawDataStatusChangedDelegate, ShareListDialog.ClickListener {
 
@@ -55,6 +58,12 @@ public class MeetingActivity extends BaseMeetingActivity implements RawDataRende
     private FrameLayout videoContain;
 
     private AudioRawDataUtil audioRawDataUtil;
+
+    private ScaleGestureDetector scaleGestureDetector;
+    private GestureDetector gestureDetector;
+
+    private float scaleFactor = 1.0f;  // Initial scale
+
     private CmdHandler mFeedbackPushHandler = new CmdHandler() {
         @Override
         public void onCmdReceived(CmdRequest request) {
@@ -98,6 +107,11 @@ public class MeetingActivity extends BaseMeetingActivity implements RawDataRende
                 CmdHelper.getInstance().sendCommand(request);
             }
         }
+    }
+
+    @Override
+    public void onVideoAlphaChannelStatusChanged(boolean isAlphaModeOn) {
+        super.onVideoAlphaChannelStatusChanged(isAlphaModeOn);
     }
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
@@ -144,6 +158,7 @@ public class MeetingActivity extends BaseMeetingActivity implements RawDataRende
         if (null != shareToolbar) {
             shareToolbar.destroy();
         }
+        handler.removeCallbacks(runnable);
     }
 
     @Override
@@ -171,6 +186,39 @@ public class MeetingActivity extends BaseMeetingActivity implements RawDataRende
         videoContain.setOnClickListener(onEmptyContentClick);
         chatListView.setOnClickListener(onEmptyContentClick);
     }
+
+    private void setScale() {
+        scaleGestureDetector = new ScaleGestureDetector(this, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            @Override
+            public boolean onScale(@NonNull ScaleGestureDetector detector) {
+                scaleFactor *= detector.getScaleFactor();
+                Log.d(TAG, "onScale:" + scaleFactor);
+                scaleFactor = Math.max(0.1f, Math.min(scaleFactor, 5.0f));
+                zoomCanvas.switchToLevel(scaleFactor, detector.getFocusX(), detector.getFocusY());
+                return true;
+            }
+        });
+
+        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
+                onEmptyContentClick.onClick(zoomCanvas);
+                return super.onSingleTapConfirmed(e);
+            }
+        });
+
+        if (null != zoomCanvas) {
+            zoomCanvas.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    scaleGestureDetector.onTouchEvent(event);
+                    gestureDetector.onTouchEvent(event);
+                    return true;
+                }
+            });
+        }
+    }
+
 
     View.OnClickListener onEmptyContentClick = new View.OnClickListener() {
         @Override
@@ -248,20 +296,7 @@ public class MeetingActivity extends BaseMeetingActivity implements RawDataRende
         refreshFps();
         CmdHelper.getInstance().addListener(lowerThirdHandler);
         CmdHelper.getInstance().addListener(emojiHandler);
-        ZoomVideoSDKVirtualBackgroundHelper bgHelper = ZoomVideoSDK.getInstance().getVirtualBackgroundHelper();
-        List<ZoomVideoSDKVirtualBackgroundItem> backgroundList = bgHelper.getVirtualBackgroundItemList();
-        ZoomVideoSDKVirtualBackgroundItem blurItem = null;
-        for (ZoomVideoSDKVirtualBackgroundItem item : backgroundList) {
-            if (item.getType().equals(ZoomVideoSDKVirtualBackgroundDataType.ZoomVideoSDKVirtualBackgroundDataType_Blur)) {
-                blurItem = item;
-                break;  // Exit loop once the match is found
-            }
-        }
-
-//        Log.i(TAG, "blurItem: " + blurItem.getType());
-//        Log.i(TAG, "blurItem: " + blurItem.getImageName());
-//        bgHelper.setVirtualBackgroundItem(blurItem);
-//        Log.i(TAG, "isSupportVirtualBackground: " + bgHelper.isSupportVirtualBackground());
+        setScale();
     }
 
     Runnable runnable = new Runnable() {
@@ -363,8 +398,8 @@ public class MeetingActivity extends BaseMeetingActivity implements RawDataRende
         mActiveUser = user;
         onUserActive(mActiveUser);
 
-        if (null != user.getVideoStatus()) {
-            updateVideoAvatar(user.getVideoStatus().isOn());
+        if (null != user.getVideoPipe().getVideoStatus()) {
+            updateVideoAvatar(user.getVideoPipe().getVideoStatus().isOn());
         }
 
         if (null != currentShareUser) {
@@ -460,7 +495,7 @@ public class MeetingActivity extends BaseMeetingActivity implements RawDataRende
         super.onUserVideoStatusChanged(videoHelper, userList);
 
         if (null != mActiveUser && userList.contains(mActiveUser)) {
-            updateVideoAvatar(mActiveUser.getVideoStatus().isOn());
+            updateVideoAvatar(mActiveUser.getVideoPipe().getVideoStatus().isOn());
 //            if (renderType == RENDER_TYPE_ZOOMRENDERER) {
 //                if (null==currentShareUser&&mActiveUser.getVideoStatus().isOn()) {
 //                    subscribeVideoByUser(mActiveUser);

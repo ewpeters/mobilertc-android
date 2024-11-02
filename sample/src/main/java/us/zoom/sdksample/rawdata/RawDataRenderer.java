@@ -6,6 +6,8 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.util.AttributeSet;
 
+import java.nio.ByteBuffer;
+
 import us.zoom.rawdatarender.RawDataBufferType;
 import us.zoom.rawdatarender.ZoomSurfaceViewRender;
 import us.zoom.sdk.ZoomVideoSDK;
@@ -31,6 +33,8 @@ public class RawDataRenderer extends ZoomSurfaceViewRender implements ZoomVideoS
     private boolean isSubscribeShare = false;
 
     private RawDataStatusChangedDelegate delegate;
+
+    private boolean removeBackground = true;
 
     public interface RawDataStatusChangedDelegate {
         void onRawDataStatusChanged(RawDataStatus status, ZoomVideoSDKUser user);
@@ -103,13 +107,21 @@ public class RawDataRenderer extends ZoomSurfaceViewRender implements ZoomVideoS
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    drawI420YUV(rawData.getyBuffer(), rawData.getuBuffer(), rawData.getvBuffer(),
+                    ByteBuffer yBuffer = rawData.getyBuffer();
+                    if (removeBackground) {
+                        yBuffer = removeBackground(rawData.getyBuffer(), rawData.getAlphaBuffer());
+                    }
+                    drawI420YUV(yBuffer, rawData.getuBuffer(), rawData.getvBuffer(),
                             rawData.getStreamWidth(), rawData.getStreamHeight(), rawData.getRotation(), 30);
                     rawData.releaseRef();
                 }
             });
         } else {
-            drawI420YUV(rawData.getyBuffer(), rawData.getuBuffer(), rawData.getvBuffer(),
+            ByteBuffer yBuffer = rawData.getyBuffer();
+            if (removeBackground) {
+                yBuffer = removeBackground(rawData.getyBuffer(), rawData.getAlphaBuffer());
+            }
+            drawI420YUV(yBuffer, rawData.getuBuffer(), rawData.getvBuffer(),
                     rawData.getStreamWidth(), rawData.getStreamHeight(), rawData.getRotation(), 30);
 
         }
@@ -141,5 +153,24 @@ public class RawDataRenderer extends ZoomSurfaceViewRender implements ZoomVideoS
     }
 
 
+    private ByteBuffer removeBackground(ByteBuffer yBuffer, ByteBuffer aBuffer) {
+        if (aBuffer == null) {
+            return yBuffer;
+        }
+        ByteBuffer newYBuffer = ByteBuffer.allocateDirect(yBuffer.capacity());
+        int size = yBuffer.capacity();
+        byte[] buffer = new byte[size];
+        for (int i = 0; i < size; i++) {
+            int val = aBuffer.get(i);
+            if (val == 0) {
+                buffer[i] = 0;
+            } else {
+                buffer[i] = yBuffer.get(i);
+            }
+        }
+        newYBuffer.put(buffer);
+        newYBuffer.rewind();
+        return newYBuffer;
+    }
 }
 
